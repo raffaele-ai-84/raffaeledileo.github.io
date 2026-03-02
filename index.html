@@ -32,19 +32,18 @@ body.light { background:#f9f9f9; color:#111; }
 nav { position:sticky; top:0; width:100%; display:flex; justify-content:center; align-items:center; gap:20px; padding:12px 0; z-index:100; border-bottom:1px solid; transition: background 0.5s, border-color 0.5s; }
 body.dark nav { background:rgba(10,10,15,0.85); border-color:#222; }
 body.light nav { background:rgba(250,250,250,0.95); border-color:#ccc; }
-nav a { font-weight:bold; text-decoration:none; transition: color 0.3s; padding:4px 8px; border-radius:4px; }
+nav a { font-weight:bold; text-decoration:none; transition: color 0.3s; }
 body.dark nav a { color:#00f5ff; }
 body.light nav a { color:#0077cc; }
-nav a.active { background:currentColor; color:#000; }
-nav a:hover { opacity:0.7; }
+nav a:hover { color:#fff; }
 
-.toggle-mode { cursor:pointer; padding:6px 12px; border:1px solid; border-radius:6px; transition: all 0.3s; font-size:0.9rem; margin-left:10px;}
+.toggle-mode { cursor:pointer; padding:6px 12px; border:1px solid; border-radius:6px; transition: all 0.3s; font-size:0.9rem; }
 body.dark .toggle-mode { border-color:#00f5ff; color:#00f5ff; }
 body.light .toggle-mode { border-color:#0077cc; color:#0077cc; }
 .toggle-mode:hover { background:currentColor; color:#000; }
 
 /* SEZIONI GENERALI */
-section { padding:80px 5%; max-width:1200px; margin:auto; opacity:0; transform: translateY(50px); transition: all 0.8s ease-out; scroll-margin-top:80px; }
+section { padding:80px 5%; max-width:1200px; margin:auto; opacity:0; transform: translateY(50px); transition: all 0.8s ease-out; }
 section.visible { opacity:1; transform: translateY(0); }
 
 h1 { font-size:2.8rem; text-align:center; background-size:200% 200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation: gradientAnim 6s ease infinite; }
@@ -164,43 +163,51 @@ body.dark footer { color:#fff; }
 
 <script>
 /* ===== DARK/LIGHT MODE ===== */
-const modeToggle=document.getElementById('modeToggle');
+const modeToggle = document.getElementById('modeToggle');
 function setMode(mode){
   document.body.classList.remove('dark','light');
   document.body.classList.add(mode);
   localStorage.setItem('mode',mode);
-  modeToggle.textContent = mode==='dark'?'🌙':'☀️';
+  modeToggle.textContent = mode==='dark' ? '🌙' : '☀️';
 }
-setMode(localStorage.getItem('mode')||'dark');
-modeToggle.addEventListener('click',()=>setMode(document.body.classList.contains('dark')?'light':'dark'));
+const savedMode = localStorage.getItem('mode') || 'dark';
+setMode(savedMode);
+modeToggle.addEventListener('click',()=>{ setMode(document.body.classList.contains('dark')?'light':'dark'); });
 
 /* ===== TYPING EFFECT CICLICO ===== */
-const phrases=["AI Automation","Generative Systems","Infrastructure Optimization"];
-const typingDiv=document.getElementById("typing");
-let phraseIndex=0,charIndex=0;
-function type(){const current=phrases[phraseIndex]; if(charIndex<current.length){ typingDiv.innerHTML+=current.charAt(charIndex); charIndex++; requestAnimationFrame(type);} else setTimeout(erase,1500);}
-function erase(){const current=phrases[phraseIndex]; if(charIndex>0){ typingDiv.innerHTML=current.substring(0,charIndex-1); charIndex--; requestAnimationFrame(erase);} else{ phraseIndex=(phraseIndex+1)%phrases.length; setTimeout(type,500);}}
+const phrases = ["AI Automation", "Generative Systems", "Infrastructure Optimization"];
+const typingDiv = document.getElementById("typing");
+let phraseIndex=0, charIndex=0;
+function type(){ const current=phrases[phraseIndex]; if(charIndex<current.length){ typingDiv.innerHTML+=current.charAt(charIndex); charIndex++; requestAnimationFrame(type);} else{ setTimeout(erase,1500);} }
+function erase(){ const current=phrases[phraseIndex]; if(charIndex>0){ typingDiv.innerHTML=current.substring(0,charIndex-1); charIndex--; requestAnimationFrame(erase);} else{ phraseIndex=(phraseIndex+1)%phrases.length; setTimeout(type,500);} }
 type();
 
 /* ===== PROJECTS ===== */
-const projects=[ {title:"AI Workflow Lab",desc:"Pipeline generative locali ottimizzate GPU."}, {title:"Infrastructure AI Monitoring",desc:"Monitoraggio predittivo con modelli ML."}, {title:"Automation Engine",desc:"Script e orchestrazioni per ambienti enterprise."} ];
+const projects = [
+  { title:"AI Workflow Lab", desc:"Pipeline generative locali ottimizzate GPU." },
+  { title:"Infrastructure AI Monitoring", desc:"Monitoraggio predittivo con modelli ML." },
+  { title:"Automation Engine", desc:"Script e orchestrazioni per ambienti enterprise." }
+];
 const grid=document.getElementById("projectGrid");
 projects.forEach(p=>{ const card=document.createElement("div"); card.className="card"; card.innerHTML=`<h3>${p.title}</h3><p>${p.desc}</p>`; grid.appendChild(card); });
 
 /* ===== PARTICLE NETWORK ===== */
-const canvas=document.getElementById("network"); const ctx=canvas.getContext("2d");
-function resizeCanvas(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
+const canvas=document.getElementById("network");
+const ctx=canvas.getContext("2d");
+function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
 window.addEventListener('resize',resizeCanvas); resizeCanvas();
 let particles=[]; const particleCount=Math.min(80,Math.floor(window.innerWidth/10));
-for(let i=0;i<particleCount;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5});}
-function draw(){ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fillStyle=document.body.classList.contains('dark')?"#00f5ff":"#0077cc";ctx.fill();});for(let a=0;a<particles.length;a++){for(let b=a+1;b<particles.length;b++){let dx=particles[a].x-particles[b].x;let dy=particles[a].y-particles[b].y;let dist=Math.sqrt(dx*dx+dy*dy);if(dist<120){ctx.beginPath();ctx.moveTo(particles[a].x,particles[a].y);ctx.lineTo(particles[b].x,particles[b].y);ctx.strokeStyle=document.body.classList.contains('dark')?"rgba(0,245,255,0.1)":"rgba(0,119,204,0.1)";ctx.stroke();}}}requestAnimationFrame(draw);}
+for(let i=0;i<particleCount;i++){ particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5}); }
+function draw(){ ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>canvas.width)p.vx*=-1; if(p.y<0||p.y>canvas.height)p.vy*=-1; ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fillStyle=document.body.classList.contains('dark')?"#00f5ff":"#0077cc"; ctx.fill(); });
+for(let a=0;a<particles.length;a++){for(let b=a+1;b<particles.length;b++){let dx=particles[a].x-particles[b].x;let dy=particles[a].y-particles[b].y;let dist=Math.sqrt(dx*dx+dy*dy); if(dist<120){ctx.beginPath();ctx.moveTo(particles[a].x,particles[a].y);ctx.lineTo(particles[b].x,particles[b].y);ctx.strokeStyle=document.body.classList.contains('dark')?"rgba(0,245,255,0.1)":"rgba(0,119,204,0.1)";ctx.stroke();}}} requestAnimationFrame(draw);}
 draw();
 
 /* ===== TERMINAL ===== */
 const terminalLines=["Booting AI Core...","Loading neural modules...","Optimizing infrastructure...","System ready."];
 const terminalDiv=document.getElementById('terminal');
 function showTerminalLine(index){if(index<terminalLines.length){const line=document.createElement("div");line.className="terminal-line";line.textContent="> "+terminalLines[index];terminalDiv.appendChild(line);setTimeout(()=>{line.style.opacity=1;line.style.transform="translateX(0)";},50);setTimeout(()=>showTerminalLine(index+1),400);}}
-const terminalObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){showTerminalLine(0);terminalObserver.unobserve(entry.target);}}},{threshold:0.3}); terminalObserver.observe(terminalDiv);
+const terminalObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){showTerminalLine(0);terminalObserver.unobserve(entry.target);}}},{threshold:0.3});
+terminalObserver.observe(terminalDiv);
 
 /* ===== CARDS SEQUENZIALI ===== */
 const cardObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){const cards=entry.target.querySelectorAll('.card');cards.forEach((c,i)=>setTimeout(()=>c.classList.add('visible'),i*200));cardObserver.unobserve(entry.target);}}},{threshold:0.3});
@@ -209,21 +216,6 @@ cardObserver.observe(document.getElementById('projects'));
 /* ===== SECTION FADE-IN ===== */
 const sectionObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add('visible');});},{threshold:0.2});
 document.querySelectorAll('section').forEach(s=>sectionObserver.observe(s));
-
-/* ===== NAVBAR ACTIVE LINK HIGHLIGHT & SMOOTH SCROLL ===== */
-const navLinks=document.querySelectorAll('nav a[href^="#"]');
-function onScroll(){
-  let scrollPos=window.scrollY+100;
-  navLinks.forEach(link=>{
-    const section=document.querySelector(link.getAttribute('href'));
-    if(section.offsetTop<=scrollPos && section.offsetTop+section.offsetHeight>scrollPos){
-      navLinks.forEach(l=>l.classList.remove('active'));
-      link.classList.add('active');
-    }
-  });
-}
-window.addEventListener('scroll',onScroll);
-onScroll();
 </script>
 
 </body>
